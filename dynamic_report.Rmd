@@ -1,0 +1,75 @@
+---
+title: My dynamic report
+output: html_fragment
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, message=FALSE, warning=FALSE, error=FALSE)
+
+```
+
+```{css}
+h2 {
+  background-color: red;
+  font-weight: bold;
+  text-align: center;
+}
+
+p {
+  text-align: center;
+}
+
+```
+
+## Laptop Battery Life and Charging Habits
+
+```{r}
+library(tidyverse)
+
+logged_data <- read_csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vQVoPzzUIPLewD8qaB7zKDR4xp3p1ixLZIY8dZV4xfgCVC1UToJHnMpKi1_Oqt-yH_y8NKusvtaffXy/pub?output=csv")
+
+latest_data <- logged_data %>%
+  rename(battery_start = 2,
+         time_charged = 3,
+         battery_stop = 4,
+         charge_duration = 5)
+
+lowest_battery_start = min(latest_data$battery_start)
+highest_battery_stop = max(latest_data$battery_stop)
+latest_time <- max(latest_data$time_charged)
+earliest_time <- min(latest_data$time_charged)
+
+bar_chart1 <- latest_data %>%
+  ggplot() +
+    geom_bar(aes(x = charge_duration)) +
+  labs(title = "How long the battery lasted after the laptop stopped charging",
+       x = "Time lasted",
+       y = "Number of times a battery charge lasted") 
+
+bar_chart2 <- latest_data %>%
+  ggplot() +
+    geom_bar(aes(y = battery_start)) +
+  labs(title = "What battery % does the laptop usually start charging from?",
+       x = "Number of times the laptop was charging from that % range",
+       y = "Battery %")
+
+bar_chart3 <- latest_data %>%
+  ggplot() +
+  geom_bar(aes(x = battery_stop)) +
+  labs(title = "What battery % does the laptop reach before the charging stops?",
+       x = "Battery %",
+       y = "Number of times the laptop stopped charging at that % range")
+
+bar_chart1
+bar_chart2
+bar_chart3
+
+```
+
+The highest battery percentage that the laptop charged to was `r highest_battery_stop`.
+
+The lowest battery percentage on the laptop before it was charged was `r lowest_battery_start`.
+
+The earliest time that the laptop was charged was at `r earliest_time`:00.
+
+The latest time that the laptop was charged was at `r latest_time`:00.
